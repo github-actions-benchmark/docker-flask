@@ -8,14 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: docker build . -t thing
+      - run: docker build app/. -t thing
   build_no_cache_buildkit:
     env:
       DOCKER_BUILDKIT: '1'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: docker build . -t thing
+      - run: docker build app/. -t thing
   build_with_docker_save_load:
     runs-on: ubuntu-latest
     steps:
@@ -24,10 +24,10 @@ jobs:
       uses: actions/cache@v1
       with:
         path: /tmp/docker-save
-        key: docker-save-${{ hashFiles('Dockerfile') }}
+        key: docker-save-${{ github.sha }}
     - run: docker load -i /tmp/docker-save/snapshot.tar || true
       if: steps.cache-docker.outputs.cache-hit == 'true'
-    - run: docker build . -t thing --cache-from=thing-cache
+    - run: docker build app/. -t thing --cache-from=thing-cache
     - run: docker tag thing thing-cache && mkdir -p /tmp/docker-save && docker save thing-cache -o /tmp/docker-save/snapshot.tar && ls -lh /tmp/docker-save || true
       if: always() && steps.cache-docker.outputs.cache-hit != 'true'
   build_with_local_registry:
@@ -38,10 +38,10 @@ jobs:
         uses: actions/cache@v1
         with:
           path: /tmp/docker-registry
-          key: docker-registry-no-buildkit-${{ hashFiles('Dockerfile') }}
+          key: docker-registry-no-buildkit-${{ github.sha }}
       - run: docker run -d -p 5000:5000 --restart=always --name registry -v /tmp/docker-registry:/var/lib/registry registry:2 && npx wait-on tcp:5000
       - run: docker pull localhost:5000/thing || true
-      - run: docker build . -t thing --cache-from=localhost:5000/thing
+      - run: docker build app/. -t thing --cache-from=localhost:5000/thing
       - run: docker tag thing localhost:5000/thing && docker push localhost:5000/thing || true
         if: steps.cache.outputs.cache-hit != 'true'
   build_with_local_registry_buildkit:
@@ -54,9 +54,9 @@ jobs:
         uses: actions/cache@v1
         with:
           path: /tmp/docker-registry
-          key: docker-registry-buildkit-${{ hashFiles('Dockerfile') }}
+          key: docker-registry-buildkit-${{ github.sha }}
       - run: docker run -d -p 5000:5000 --restart=always --name registry -v /tmp/docker-registry:/var/lib/registry registry:2 && npx wait-on tcp:5000
-      - run: docker build . -t thing --cache-from=localhost:5000/thing --build-arg BUILDKIT_INLINE_CACHE=1
+      - run: docker build app/. -t thing --cache-from=localhost:5000/thing --build-arg BUILDKIT_INLINE_CACHE=1
       - run: docker tag thing localhost:5000/thing && docker push localhost:5000/thing || true
         if: steps.cache.outputs.cache-hit != 'true'
   build_with_gpr:
@@ -65,7 +65,7 @@ jobs:
       - uses: actions/checkout@v2
       - run: echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
       - run: docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
-      - run: docker build . -t thing --cache-from=docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit
+      - run: docker build app/. -t thing --cache-from=docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit
       - run: docker tag thing docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit && docker push docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
   build_with_dlc:
     if: 1==2
@@ -75,8 +75,9 @@ jobs:
       - uses: satackey/action-docker-layer-caching@v0.0.11
         # Ignore the failure of a step and avoid terminating the job.
         continue-on-error: true
-      - run: docker build . -t thing
+      - run: docker build app/. -t thing
   build_with_gpr2:
+    if: 1==2
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -89,6 +90,7 @@ jobs:
           #registry: ghcr.io
           image_name: thing
   build_cache_buildx:
+    if: 1==2
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
