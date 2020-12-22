@@ -1,6 +1,9 @@
 # set base image (host OS)
 FROM ubuntu:20.04
 
+# install python
+RUN sudo apt-get install python3.6
+
 # set the working directory in the container
 WORKDIR /code
 
