@@ -3,6 +3,7 @@ FROM ubuntu:20.04
 
 # install python
 RUN sudo apt-get install python3.6
+RUN sudo apt install python3-pip
 
 # set the working directory in the container
 WORKDIR /code
@@ -11,7 +12,7 @@ WORKDIR /code
 COPY requirements.txt .
 
 # install dependencies
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 # copy the content of the local src directory to the working directory
 COPY src/ .
