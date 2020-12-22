@@ -2,7 +2,7 @@
 FROM ubuntu:20.04
 
 # install python
-RUN sudo apt-get install python3.6
+RUN sudo apt install python3.8
 RUN sudo apt install python3-pip
 
 # set the working directory in the container
