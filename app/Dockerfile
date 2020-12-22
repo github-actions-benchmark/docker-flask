@@ -2,8 +2,8 @@
 FROM ubuntu:20.04
 
 # install python
-RUN sudo apt install python3.8
-RUN sudo apt install python3-pip
+RUN apt install python3.8
+RUN apt install python3-pip
 
 # set the working directory in the container
 WORKDIR /code
