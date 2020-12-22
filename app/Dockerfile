@@ -2,7 +2,7 @@
 FROM ubuntu:20.04
 
 # install python
-RUN apt-get update && apt-get install software-properties-common && add-apt-repository universe &&  apt install python3-pip
+RUN apt-get update -y && apt-get install software-properties-common -y && add-apt-repository universe -y &&  apt install python3-pip -y
 
 # set the working directory in the container
 WORKDIR /code
