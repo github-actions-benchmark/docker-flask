@@ -2,7 +2,7 @@
 FROM ubuntu:20.04
 
 # install python
-RUN apt install python3-pip
+RUN add-apt-repository universe | apt-get update | apt install python3-pip
 
 # set the working directory in the container
 WORKDIR /code
